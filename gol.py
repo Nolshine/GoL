@@ -77,15 +77,16 @@ def renderTile(row,col):
         pygame.draw.rect(screen, (0,0,0), inner)
 
 GRID = []
-for row in range(16):
+for row in range(32):
     GRID.append([])
-    for col in range(16):
+    for col in range(32):
         GRID[row].append(randrange(2))
 
 #START THE SIM
 pygame.init()
 
-SCREEN_SIZE = ((16*16),(16*16)) #size of window
+
+SCREEN_SIZE = ((32*16),(32*16)) #size of window
 SPEED = 100 #speed, in ms, of simulation
 
 screen = pygame.display.set_mode(SCREEN_SIZE, DOUBLEBUF)
