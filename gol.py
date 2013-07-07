@@ -14,7 +14,7 @@ PAUSED = False
 
 SCREEN_SIZE = ((32*16),(32*16)) #size of window
 
-SPEED = 20 #time between updates in ms
+SPEED = 45 #time between updates in ms
 
 
 
