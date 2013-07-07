@@ -26,6 +26,7 @@ def processEvents():
         cond2 = ((event.type == KEYDOWN) and (event.key == K_ESCAPE))
         cond3 = ((event.type == KEYDOWN) and (event.key == K_SPACE))
         cond4 = ((event.type == KEYDOWN) and (event.key == K_r))
+        cond5 = ((event.type == KEYDOWN) and (event.key == K_e))
         
         if cond1 or cond2:
             pygame.quit()
@@ -49,6 +50,9 @@ def processEvents():
             
         if cond4:
             event_array.append("RESET")
+
+        if cond5:
+            event_array.append("ERASE")
             
     return event_array
                 
@@ -143,6 +147,11 @@ def resetGrid():
         for col in range(len(GRID[row])):
             GRID[row][col] = randrange(2)
 
+def eraseGrid():
+    for row in range(len(GRID)):
+        for col in range(len(GRID[row])):
+            GRID[row][col] = 0
+
 #START THE SIM
 pygame.init()
 
@@ -169,6 +178,8 @@ while True:
         PAUSED = not PAUSED
     if "RESET" in event_array:
         resetGrid()
+    if "ERASE" in event_array:
+        eraseGrid()
         
     if ("MAKE_LIVING" in event_array):
         make = "MAKE_LIVING"
@@ -183,9 +194,7 @@ while True:
         GRID[(pos[1]/16)][(pos[0]/16)] = 0
         
     if "MAKE_STOP" in event_array:
-        make = "MAKE_STOP"
-
-    print make
+        make = ""
     
     
 
