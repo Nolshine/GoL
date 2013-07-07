@@ -25,7 +25,9 @@ A 16*16 cells grid will do for now, and i need to fit them in a window,
 so I'll make them 16px*16px big. Of course the sqares themselves will
 only be 14*14 but i need to include the border.
 
-GOAL: get a screen up.
+GOAL: get a screen up. *done*
+GOAL: render tilegrid. Shouldn't be too difficult, as I am
+      separating rendering from processing.
 """
 
 import pygame
@@ -44,6 +46,22 @@ def processEvents():
 
 def updateCells():
     print "update cells."
+
+def renderGrid():
+    #let's see if I can access GRID from here.
+    for row in range(16):
+        for col in range(16):
+            renderTile((row,col))
+
+def renderTile(pos):
+    tile = pygame.Rect((col*16),(row*16),16,16)
+    inner = pygame.Rect(((col*16)+2), ((row*16)+2), 14, 14)
+    if GRID[pos[0]][pos[1]] == 1:
+        pygame.draw.rect(screen, (0,0,0), tile)
+        pygame.draw.rect(screen, (255,255,255), inner)
+    else:
+        pygame.draw.rect(screen, (255,255,255), tile)
+        pygame.draw.rect(screen, (0,0,0), inner)
 
 GRID = []
 for row in range(16):
@@ -76,6 +94,8 @@ while True:
     if update_timer >= SPEED:
         update_timer = 0
         updateCells()
+
+    renderGrid()
     
 
 
