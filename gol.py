@@ -44,6 +44,17 @@ def processEvents():
             pygame.quit()
             print "This is too much. I quit!"
             return True
+        if event.type == MOUSEBUTTONDOWN:
+            pressed = pygame.mouse.get_pressed()
+            if pressed[0] == 1:
+                pos = pygame.mouse.get_pos()
+                col = pos[0]/16
+                row = pos[1]/16
+                if GRID[row][col] == 0:
+                    GRID[row][col] = 1
+                else:
+                    GRID[row][col] = 0
+                
     return False
 
 def updateCells():
