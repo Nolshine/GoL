@@ -33,6 +33,8 @@ GOAL: render tilegrid. Shouldn't be too difficult, as I am
 import pygame
 from pygame.locals import *
 
+from random import randrange
+
 
 def processEvents():
     for event in pygame.event.get():
@@ -67,7 +69,7 @@ GRID = []
 for row in range(16):
     GRID.append([])
     for col in range(16):
-        GRID[row].append(0)
+        GRID[row].append(randrange(2))
 
 #START THE SIM
 pygame.init()
