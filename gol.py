@@ -59,7 +59,61 @@ def processEvents():
 
 def updateCells():
     print "update cells."
+    for row in range(len(GRID)):
+        for col in range(len(GRID[0])):
+            updateCell(row,col)
 
+def updateCell(row, col):
+    #which neighbours do I have? am I a corner? an edge?
+    leftEdge = (col == 0)
+    rightEdge = (col == (len(GRID[row])-1))
+    topEdge = (row == 0)
+    bottomEdge = (row == (len(GRID)-1))
+    #now I pick up on the rules of John Conway's GoL
+    #am I alive?
+    living = False
+    if GRID[row][col] == 1:
+        living = True
+    #count my neighbours
+    neighbours = 0
+    for check_row in range(3):
+        if check_row == 0 and topEdge:
+            continue
+        if check_row == 2 and bottomEdge:
+            continue
+        for check_col in range(3):
+            if check_col == 0 and leftEdge:
+                continue
+            if check_col == 2 and rightEdge:
+                continue
+            checking_row = (row-1)+check_row
+            checking_col = (col-1)+check_col
+            if checking_row == row and checking_col == col:
+                continue
+            if GRID[checking_row][checking_col] == 1:
+                neighbours += 1
+    #determine which rules to use
+    if living:
+        #apply rules of live cells
+        #1) Any live cell with fewer than two live neighbours dies,
+        #   as if caused by under-population.
+        if neighbours < 2:
+            GRID[row][col] = 0
+        #2) Any live cell with two or three live neighbours lives on
+        #   to the next generation. (I don't need to check for this,
+        #   as checking for the other living rules suffices.)
+        #3) Any live cell with more than three live neighbours dies,
+        #   as if by overcrowding.
+        if neighbours > 3:
+            GRID[row][col] = 0
+    else:
+        #apply rules of dead cells
+        #4) Any dead cell with exactly three live neighbours becomes
+        #   a live cell, as if by reproduction.
+        if neighbours == 3:
+            GRID[row][col] = 1
+
+    
 def renderGrid():
     #let's see if I can access GRID from here.
     for row in range(len(GRID)):
@@ -87,27 +141,21 @@ pygame.init()
 
 
 SCREEN_SIZE = ((32*16),(32*16)) #size of window
-SPEED = 100 #speed, in ms, of simulation
 
 screen = pygame.display.set_mode(SCREEN_SIZE, DOUBLEBUF)
 
 clock = pygame.time.Clock()
 
-update_timer = 0
-
 while True:
 
     time_passed = clock.tick(50) #limits FPS to 50 and stores time.
-    update_timer += time_passed
 
     screen.fill((0,0,0)) #draw black background.
 
     if processEvents():
         break
 
-    if update_timer >= SPEED:
-        update_timer = 0
-        updateCells()
+    updateCells()
 
     renderGrid()
     pygame.display.update()
