@@ -1,35 +1,3 @@
-"""
-Simulating John Conway's Game of Life
-
-Step 1) Display a grid. I had neglected to remember until now
-that to display a grid you need to display borders. But I've already
-thought of a possible solution.
-    1a) First, you workout if the cell is  living or dead.
-    1b) then you draw a filled square that's white if the cell's dead,
-        or black if it's living.
-    1c) then you draw a square smaller by 2px*2px that's filled with
-        the opposite color to the one you drew before, smack in the
-        centre of the other square.
-
-(But of course, first we must make a screen appear, make it fit the grid)
-
-
-Let's think about the grid. I want to get to the stage where I'm
-simulating rules fairly quickly, and I think I want to do it on... hm
-i guess a fairly small, finite and bound space. I don't have a choice
-regarding bound, I don't know how to make things scroll or w/e.
-Finite because I do not yet want to warp stuff, although I will after I'm done
-reaching the first GoL.
-
-A 16*16 cells grid will do for now, and i need to fit them in a window,
-so I'll make them 16px*16px big. Of course the sqares themselves will
-only be 14*14 but i need to include the border.
-
-GOAL: get a screen up. *done*
-GOAL: render tilegrid. Shouldn't be too difficult, as I am
-      separating rendering from processing.
-"""
-
 import pygame
 from pygame.locals import *
 
@@ -57,6 +25,7 @@ def processEvents():
         cond1 = (event.type == QUIT)
         cond2 = ((event.type == KEYDOWN) and (event.key == K_ESCAPE))
         cond3 = ((event.type == KEYDOWN) and (event.key == K_SPACE))
+        cond4 = ((event.type == KEYDOWN) and (event.key == K_r))
         if cond1 or cond2:
             pygame.quit()
             print "This is too much. I quit!"
@@ -73,6 +42,8 @@ def processEvents():
                     GRID[row][col] = 1
                 else:
                     GRID[row][col] = 0
+        if cond4:
+            event_array.append("RESET")
     return event_array
                 
 
@@ -161,6 +132,11 @@ def renderTile(row,col):
         pygame.draw.rect(screen, (255,255,255), tile)
         pygame.draw.rect(screen, (0,0,0), inner)
 
+def resetGrid():
+    for row in range(len(GRID)):
+        for col in range(len(GRID[row])):
+            GRID[row][col] = randrange(2)
+
 #START THE SIM
 pygame.init()
 
@@ -168,7 +144,7 @@ screen = pygame.display.set_mode(SCREEN_SIZE, DOUBLEBUF)
 
 clock = pygame.time.Clock()
 
-pygame.display.set_caption("SPACEBAR TO PAUSE/UNPAUSE. CLICK CELLS TO CHANGE THEM")
+pygame.display.set_caption("click cells to change. space to pause/unpause. 'r' to reseed.")
 
 update_timer = 0
 
@@ -181,6 +157,8 @@ while True:
     event_array = processEvents()
     if "PAUSE" in event_array:
         PAUSED = not PAUSED
+    if "RESET" in event_array:
+        resetGrid()
 
     if not PAUSED:
         update_timer += time_passed
