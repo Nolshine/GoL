@@ -26,24 +26,30 @@ def processEvents():
         cond2 = ((event.type == KEYDOWN) and (event.key == K_ESCAPE))
         cond3 = ((event.type == KEYDOWN) and (event.key == K_SPACE))
         cond4 = ((event.type == KEYDOWN) and (event.key == K_r))
+        
         if cond1 or cond2:
             pygame.quit()
             print "This is too much. I quit!"
             quit()
+            
         if cond3:
             event_array.append("PAUSE")
+            
         if event.type == MOUSEBUTTONDOWN:
-            pressed = pygame.mouse.get_pressed()
-            if pressed[0] == 1:
-                pos = pygame.mouse.get_pos()
-                col = pos[0]/16
-                row = pos[1]/16
-                if GRID[row][col] == 0:
-                    GRID[row][col] = 1
-                else:
-                    GRID[row][col] = 0
+            pos = pygame.mouse.get_pos()
+            if GRID[(pos[1]/16)][(pos[0]/16)] == 0:
+                GRID[(pos[1]/16)][(pos[0]/16)] = 1
+                event_array.append("MAKE_LIVING")
+            else:
+                GRID[(pos[1]/16)][(pos[0]/16)] = 0
+                event_array.append("MAKE_DEAD")
+                
+        if event.type == MOUSEBUTTONUP:
+            event_array.append("MAKE_STOP")
+            
         if cond4:
             event_array.append("RESET")
+            
     return event_array
                 
 
@@ -148,6 +154,8 @@ pygame.display.set_caption("click cells to change. space to pause/unpause. 'r' t
 
 update_timer = 0
 
+make = ""
+
 while True:
 
     time_passed = clock.tick(50) #limits FPS to 50 and stores time.
@@ -155,10 +163,31 @@ while True:
     screen.fill((0,0,0)) #draw black background.
 
     event_array = processEvents()
+
+    
     if "PAUSE" in event_array:
         PAUSED = not PAUSED
     if "RESET" in event_array:
         resetGrid()
+        
+    if ("MAKE_LIVING" in event_array):
+        make = "MAKE_LIVING"
+    if (make == "MAKE_LIVING"):
+        pos = pygame.mouse.get_pos()
+        GRID[(pos[1]/16)][(pos[0]/16)] = 1
+        
+    if ("MAKE_DEAD" in event_array):
+        make = "MAKE_DEAD"
+    if (make == "MAKE_DEAD"):
+        pos = pygame.mouse.get_pos()
+        GRID[(pos[1]/16)][(pos[0]/16)] = 0
+        
+    if "MAKE_STOP" in event_array:
+        make = "MAKE_STOP"
+
+    print make
+    
+    
 
     if not PAUSED:
         update_timer += time_passed
