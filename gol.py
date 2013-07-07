@@ -74,20 +74,28 @@ def processEvents():
     return event_array
                 
 
-def updateCells(0):
+def updateCells():
     print "update cells."
+    
+    #make a grid to track changes
+    change_grid = GRID
+    
     for row in range(len(GRID)):
         for col in range(len(GRID[0])):
-            updateCell(row,col)
+            change_grid = updateCell(row,col,change_grid)
 
-def updateCell(row, col):
+    for row in range(len(GRID)):
+        for col in range(len(GRID[0])):
+            GRID[row][col] = change_grid[row][col]
+    
+def updateCell(row, col, change_grid):
     #must loop twice, once to find out what to needs changing,
     #and then again to change it without being affected by my own changes.
     #which neighbours do I have? am I a corner? an edge?
-    leftEdge = (col == 0)
-    rightEdge = (col == (len(GRID[row])-1))
-    topEdge = (row == 0)
-    bottomEdge = (row == (len(GRID)-1))
+    left_edge = (col == 0)
+    right_edge = (col == (len(GRID[row])-1))
+    top_edge = (row == 0)
+    bottom_edge = (row == (len(GRID)-1))
     #now I pick up on the rules of John Conway's GoL
     #am I alive?
     living = False
@@ -96,14 +104,14 @@ def updateCell(row, col):
     #count my neighbours
     neighbours = 0
     for check_row in range(3):
-        if check_row == 0 and topEdge:
+        if check_row == 0 and top_edge:
             continue
-        if check_row == 2 and bottomEdge:
+        if check_row == 2 and bottom_edge:
             continue
         for check_col in range(3):
-            if check_col == 0 and leftEdge:
+            if check_col == 0 and left_edge:
                 continue
-            if check_col == 2 and rightEdge:
+            if check_col == 2 and right_edge:
                 continue
             checking_row = (row-1)+check_row
             checking_col = (col-1)+check_col
@@ -117,20 +125,22 @@ def updateCell(row, col):
         #1) Any live cell with fewer than two live neighbours dies,
         #   as if caused by under-population.
         if neighbours < 2:
-            GRID[row][col] = 0
+            change_grid[row][col] = 0
         #2) Any live cell with two or three live neighbours lives on
         #   to the next generation. (I don't need to check for this,
         #   as checking for the other living rules suffices.)
         #3) Any live cell with more than three live neighbours dies,
         #   as if by overcrowding.
         if neighbours > 3:
-            GRID[row][col] = 0
+            change_grid[row][col] = 0
     else:
         #apply rules of dead cells
         #4) Any dead cell with exactly three live neighbours becomes
         #   a live cell, as if by reproduction.
         if neighbours == 3:
-            GRID[row][col] = 1
+            change_grid[row][col] = 1
+
+    return change_grid
 
     
 def renderGrid():
