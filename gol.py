@@ -62,8 +62,8 @@ def updateCells():
 
 def renderGrid():
     #let's see if I can access GRID from here.
-    for row in range(16):
-        for col in range(16):
+    for row in range(len(GRID)):
+        for col in range(len(GRID[0])):
             renderTile(row,col)
 
 def renderTile(row,col):
