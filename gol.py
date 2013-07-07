@@ -78,17 +78,19 @@ def updateCells():
     print "update cells."
     
     #make a grid to track changes
-    change_grid = GRID
+    change_marks = []
     
     for row in range(len(GRID)):
         for col in range(len(GRID[0])):
-            change_grid = updateCell(row,col,change_grid)
+            change_marks = updateCell(row,col,change_marks)
 
-    for row in range(len(GRID)):
-        for col in range(len(GRID[0])):
-            GRID[row][col] = change_grid[row][col]
+    for item in change_marks:
+        if GRID[item[0]][item[1]] == 1:
+            GRID[item[0]][item[1]] = 0
+        else:
+            GRID[item[0]][item[1]] = 1
     
-def updateCell(row, col, change_grid):
+def updateCell(row, col, change_marks):
     #must loop twice, once to find out what to needs changing,
     #and then again to change it without being affected by my own changes.
     #which neighbours do I have? am I a corner? an edge?
@@ -125,22 +127,22 @@ def updateCell(row, col, change_grid):
         #1) Any live cell with fewer than two live neighbours dies,
         #   as if caused by under-population.
         if neighbours < 2:
-            change_grid[row][col] = 0
+            change_marks.append((row,col))
         #2) Any live cell with two or three live neighbours lives on
         #   to the next generation. (I don't need to check for this,
         #   as checking for the other living rules suffices.)
         #3) Any live cell with more than three live neighbours dies,
         #   as if by overcrowding.
         if neighbours > 3:
-            change_grid[row][col] = 0
+            change_marks.append((row,col))
     else:
         #apply rules of dead cells
         #4) Any dead cell with exactly three live neighbours becomes
         #   a live cell, as if by reproduction.
         if neighbours == 3:
-            change_grid[row][col] = 1
+            change_marks.append((row,col))
 
-    return change_grid
+    return change_marks
 
     
 def renderGrid():
