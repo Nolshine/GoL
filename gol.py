@@ -51,12 +51,12 @@ def renderGrid():
     #let's see if I can access GRID from here.
     for row in range(16):
         for col in range(16):
-            renderTile((row,col))
+            renderTile(row,col)
 
-def renderTile(pos):
+def renderTile(row,col):
     tile = pygame.Rect((col*16),(row*16),16,16)
-    inner = pygame.Rect(((col*16)+2), ((row*16)+2), 14, 14)
-    if GRID[pos[0]][pos[1]] == 1:
+    inner = pygame.Rect(((col*16)+1), ((row*16)+1), 14, 14)
+    if GRID[row][col] == 1:
         pygame.draw.rect(screen, (0,0,0), tile)
         pygame.draw.rect(screen, (255,255,255), inner)
     else:
@@ -96,7 +96,6 @@ while True:
         updateCells()
 
     renderGrid()
-    
-
+    pygame.display.update()
 
 
