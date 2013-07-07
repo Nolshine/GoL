@@ -35,15 +35,32 @@ from pygame.locals import *
 
 from random import randrange
 
+#globals:
+GRID = []
+for row in range(32):
+    GRID.append([])
+    for col in range(32):
+        GRID[row].append(0)
+
+PAUSED = True
+
+SCREEN_SIZE = ((32*16),(32*16)) #size of window
+
+
+
 
 def processEvents():
+    event_array = []
     for event in pygame.event.get():
         cond1 = (event.type == QUIT)
         cond2 = ((event.type == KEYDOWN) and (event.key == K_ESCAPE))
+        cond3 = ((event.type == KEYDOWN) and (event.key == K_SPACE))
         if cond1 or cond2:
             pygame.quit()
             print "This is too much. I quit!"
-            return True
+            quit()
+        if cond3:
+            event_array.append("PAUSE")
         if event.type == MOUSEBUTTONDOWN:
             pressed = pygame.mouse.get_pressed()
             if pressed[0] == 1:
@@ -54,16 +71,18 @@ def processEvents():
                     GRID[row][col] = 1
                 else:
                     GRID[row][col] = 0
+    return event_array
                 
-    return False
 
-def updateCells():
+def updateCells(0):
     print "update cells."
     for row in range(len(GRID)):
         for col in range(len(GRID[0])):
             updateCell(row,col)
 
 def updateCell(row, col):
+    #must loop twice, once to find out what to needs changing,
+    #and then again to change it without being affected by my own changes.
     #which neighbours do I have? am I a corner? an edge?
     leftEdge = (col == 0)
     rightEdge = (col == (len(GRID[row])-1))
@@ -130,21 +149,14 @@ def renderTile(row,col):
         pygame.draw.rect(screen, (255,255,255), tile)
         pygame.draw.rect(screen, (0,0,0), inner)
 
-GRID = []
-for row in range(32):
-    GRID.append([])
-    for col in range(32):
-        GRID[row].append(randrange(2))
-
 #START THE SIM
 pygame.init()
-
-
-SCREEN_SIZE = ((32*16),(32*16)) #size of window
 
 screen = pygame.display.set_mode(SCREEN_SIZE, DOUBLEBUF)
 
 clock = pygame.time.Clock()
+
+pygame.display.set_caption("SPACEBAR TO PAUSE/UNPAUSE. CLICK CELLS TO CHANGE THEM")
 
 while True:
 
@@ -152,10 +164,12 @@ while True:
 
     screen.fill((0,0,0)) #draw black background.
 
-    if processEvents():
-        break
+    event_array = processEvents()
+    if "PAUSE" in event_array:
+        PAUSED = not PAUSED
 
-    updateCells()
+    if not PAUSED:
+        updateCells()
 
     renderGrid()
     pygame.display.update()
