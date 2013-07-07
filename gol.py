@@ -40,11 +40,13 @@ GRID = []
 for row in range(32):
     GRID.append([])
     for col in range(32):
-        GRID[row].append(0)
+        GRID[row].append(randrange(2))
 
-PAUSED = True
+PAUSED = False
 
 SCREEN_SIZE = ((32*16),(32*16)) #size of window
+
+SPEED = 20 #time between updates in ms
 
 
 
@@ -75,9 +77,7 @@ def processEvents():
                 
 
 def updateCells():
-    print "update cells."
-    
-    #make a grid to track changes
+    #mark positions to change
     change_marks = []
     
     for row in range(len(GRID)):
@@ -170,6 +170,8 @@ clock = pygame.time.Clock()
 
 pygame.display.set_caption("SPACEBAR TO PAUSE/UNPAUSE. CLICK CELLS TO CHANGE THEM")
 
+update_timer = 0
+
 while True:
 
     time_passed = clock.tick(50) #limits FPS to 50 and stores time.
@@ -181,8 +183,11 @@ while True:
         PAUSED = not PAUSED
 
     if not PAUSED:
-        updateCells()
-
+        update_timer += time_passed
+        if update_timer >= SPEED:
+            updateCells()
+            update_timer = 0
+            
     renderGrid()
     pygame.display.update()
 
