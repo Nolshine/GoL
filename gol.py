@@ -6,9 +6,9 @@ from random import randrange
 #globals:
 PAUSED = False
 
-TILE_SIZE = 8 #...squared. that's the tile size in px
+TILE_SIZE = 16 #...squared. that's the tile size in px
 
-GRID_SIZE = 48 #...squared. square size of grid, in tiles.
+GRID_SIZE = 32 #...squared. square size of grid, in tiles.
 
 SCREEN_SIZE = ((GRID_SIZE*TILE_SIZE),(GRID_SIZE*TILE_SIZE)) #size of window
 
@@ -31,6 +31,7 @@ def processEvents():
         cond3 = ((event.type == KEYDOWN) and (event.key == K_SPACE))
         cond4 = ((event.type == KEYDOWN) and (event.key == K_r))
         cond5 = ((event.type == KEYDOWN) and (event.key == K_e))
+        cond6 = ((event.type == KEYDOWN) and (event.key == K_f))
         
         if cond1 or cond2:
             pygame.quit()
@@ -57,6 +58,9 @@ def processEvents():
 
         if cond5:
             event_array.append("ERASE")
+
+        if cond6:
+            event_array.append("FILL")
             
     return event_array
                 
@@ -158,6 +162,11 @@ def eraseGrid():
         for col in range(len(GRID[row])):
             GRID[row][col] = 0
 
+def fillGrid():
+    for row in range(len(GRID)):
+        for col in range(len(GRID[row])):
+            GRID[row][col] = 1
+
 #START THE SIM
 pygame.init()
 
@@ -186,6 +195,8 @@ while True:
         resetGrid()
     if "ERASE" in event_array:
         eraseGrid()
+    if "FILL" in event_array:
+        fillGrid()
         
     if ("MAKE_LIVING" in event_array):
         make = "MAKE_LIVING"
