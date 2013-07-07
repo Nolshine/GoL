@@ -4,17 +4,21 @@ from pygame.locals import *
 from random import randrange
 
 #globals:
-GRID = []
-for row in range(32):
-    GRID.append([])
-    for col in range(32):
-        GRID[row].append(randrange(2))
-
 PAUSED = False
 
-SCREEN_SIZE = ((32*16),(32*16)) #size of window
+TILE_SIZE = 8 #...squared. that's the tile size in px
 
-SPEED = 45 #time between updates in ms
+GRID_SIZE = 48 #...squared. square size of grid, in tiles.
+
+SCREEN_SIZE = ((GRID_SIZE*TILE_SIZE),(GRID_SIZE*TILE_SIZE)) #size of window
+
+SPEED = 40 #time between updates in ms
+
+GRID = []
+for row in range(GRID_SIZE):
+    GRID.append([])
+    for col in range(GRID_SIZE):
+        GRID[row].append(randrange(2))
 
 
 
@@ -38,11 +42,11 @@ def processEvents():
             
         if event.type == MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
-            if GRID[(pos[1]/16)][(pos[0]/16)] == 0:
-                GRID[(pos[1]/16)][(pos[0]/16)] = 1
+            if GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] == 0:
+                GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 1
                 event_array.append("MAKE_LIVING")
             else:
-                GRID[(pos[1]/16)][(pos[0]/16)] = 0
+                GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 0
                 event_array.append("MAKE_DEAD")
                 
         if event.type == MOUSEBUTTONUP:
@@ -133,8 +137,10 @@ def renderGrid():
             renderTile(row,col)
 
 def renderTile(row,col):
-    tile = pygame.Rect((col*16),(row*16),16,16)
-    inner = pygame.Rect(((col*16)+1), ((row*16)+1), 14, 14)
+    tile = pygame.Rect((col*TILE_SIZE),(row*TILE_SIZE),TILE_SIZE,TILE_SIZE)
+    inner = pygame.Rect(((col*TILE_SIZE)+1), ((row*TILE_SIZE)+1),
+                        TILE_SIZE-2, TILE_SIZE-2)
+    
     if GRID[row][col] == 1:
         pygame.draw.rect(screen, (0,0,0), tile)
         pygame.draw.rect(screen, (255,255,255), inner)
@@ -185,13 +191,13 @@ while True:
         make = "MAKE_LIVING"
     if (make == "MAKE_LIVING"):
         pos = pygame.mouse.get_pos()
-        GRID[(pos[1]/16)][(pos[0]/16)] = 1
+        GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 1
         
     if ("MAKE_DEAD" in event_array):
         make = "MAKE_DEAD"
     if (make == "MAKE_DEAD"):
         pos = pygame.mouse.get_pos()
-        GRID[(pos[1]/16)][(pos[0]/16)] = 0
+        GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 0
         
     if "MAKE_STOP" in event_array:
         make = ""
