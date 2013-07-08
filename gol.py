@@ -95,17 +95,15 @@ def updateCell(row, col, change_marks):
     #count my neighbours
     neighbours = 0
     for check_row in range(3):
-        if check_row == 0 and top_edge:
-            continue
-        if check_row == 2 and bottom_edge:
-            continue
+
         for check_col in range(3):
-            if check_col == 0 and left_edge:
-                continue
-            if check_col == 2 and right_edge:
-                continue
+            
             checking_row = (row-1)+check_row
             checking_col = (col-1)+check_col
+            if checking_row > len(GRID)-1:
+                checking_row = 0
+            if checking_col > len(GRID[row])-1:
+                checking_col = 0
             if checking_row == row and checking_col == col:
                 continue
             if GRID[checking_row][checking_col] == 1:
