@@ -18,7 +18,7 @@ GRID = []
 for row in range(GRID_SIZE):
     GRID.append([])
     for col in range(GRID_SIZE):
-        GRID[row].append(randrange(2))
+        GRID[row].append(randrange(3))
 
 
 
@@ -43,9 +43,17 @@ def processEvents():
             
         if event.type == MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
+            pressed = pygame.mouse.get_pressed()
             if GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] == 0:
-                GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 1
-                event_array.append("MAKE_LIVING")
+                if pressed[0]:
+                    colour = 1
+                elif pressed[2]:
+                    colour = 2
+                GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = colour
+                if colour == 1:
+                    event_array.append("MAKE_RED")
+                if colour == 2:
+                    event_array.append("MAKE_BLUE")
             else:
                 GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 0
                 event_array.append("MAKE_DEAD")
@@ -74,10 +82,10 @@ def updateCells():
             change_marks = updateCell(row,col,change_marks)
 
     for item in change_marks:
-        if GRID[item[0]][item[1]] == 1:
+        if (GRID[item[0]][item[1]] == 1) or (GRID[item[0]][item[1]] == 2):
             GRID[item[0]][item[1]] = 0
         else:
-            GRID[item[0]][item[1]] = 1
+            GRID[item[0]][item[1]] = item[2]
     
 def updateCell(row, col, change_marks):
     #must loop twice, once to find out what to needs changing,
@@ -90,10 +98,12 @@ def updateCell(row, col, change_marks):
     #now I pick up on the rules of John Conway's GoL
     #am I alive?
     living = False
-    if GRID[row][col] == 1:
+    if (GRID[row][col] == 1) or (GRID[row][col] == 2):
         living = True
     #count my neighbours
     neighbours = 0
+    reds = 0
+    blues = 0
     for check_row in range(3):
 
         for check_col in range(3):
@@ -106,28 +116,35 @@ def updateCell(row, col, change_marks):
                 checking_col = 0
             if checking_row == row and checking_col == col:
                 continue
-            if GRID[checking_row][checking_col] == 1:
+            if (GRID[checking_row][checking_col] == 1) or (GRID[checking_row][checking_col] == 2):
                 neighbours += 1
+                if GRID[checking_row][checking_col] == 1:
+                    reds += 1
+                elif GRID[checking_row][checking_col] == 2:
+                    blues += 1
     #determine which rules to use
     if living:
         #apply rules of live cells
         #1) Any live cell with fewer than two live neighbours dies,
         #   as if caused by under-population.
         if neighbours < 2:
-            change_marks.append((row,col))
+            change_marks.append((row,col,0))
         #2) Any live cell with two or three live neighbours lives on
         #   to the next generation. (I don't need to check for this,
         #   as checking for the other living rules suffices.)
         #3) Any live cell with more than three live neighbours dies,
         #   as if by overcrowding.
         if neighbours > 3:
-            change_marks.append((row,col))
+            change_marks.append((row,col,0))
     else:
         #apply rules of dead cells
         #4) Any dead cell with exactly three live neighbours becomes
         #   a live cell, as if by reproduction.
         if neighbours == 3:
-            change_marks.append((row,col))
+            colour = 1
+            if reds < blues:
+                colour = 2
+            change_marks.append((row,col,colour))
 
     return change_marks
 
@@ -145,7 +162,10 @@ def renderTile(row,col):
     
     if GRID[row][col] == 1:
         pygame.draw.rect(screen, (0,0,0), tile)
-        pygame.draw.rect(screen, (255,255,255), inner)
+        pygame.draw.rect(screen, (255,0,0), inner)
+    elif GRID[row][col] == 2:
+        pygame.draw.rect(screen, (0,0,0), tile)
+        pygame.draw.rect(screen, (0,0,255), inner)
     else:
         pygame.draw.rect(screen, (255,255,255), tile)
         pygame.draw.rect(screen, (0,0,0), inner)
@@ -153,7 +173,7 @@ def renderTile(row,col):
 def resetGrid():
     for row in range(len(GRID)):
         for col in range(len(GRID[row])):
-            GRID[row][col] = randrange(2)
+            GRID[row][col] = randrange(3)
 
 def eraseGrid():
     for row in range(len(GRID)):
@@ -163,7 +183,7 @@ def eraseGrid():
 def fillGrid():
     for row in range(len(GRID)):
         for col in range(len(GRID[row])):
-            GRID[row][col] = 1
+            GRID[row][col] = randrange(1,3)
 
 #START THE SIM
 pygame.init()
@@ -196,11 +216,16 @@ while True:
     if "FILL" in event_array:
         fillGrid()
         
-    if ("MAKE_LIVING" in event_array):
-        make = "MAKE_LIVING"
-    if (make == "MAKE_LIVING"):
+    if ("MAKE_RED" in event_array):
+        make = "MAKE_RED"
+    if ("MAKE_BLUE" in event_array):
+        make = "MAKE_BLUE"
+    if (make == "MAKE_RED"):
         pos = pygame.mouse.get_pos()
         GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 1
+    if (make == "MAKE_BLUE"):
+        pos = pygame.mouse.get_pos()
+        GRID[(pos[1]/TILE_SIZE)][(pos[0]/TILE_SIZE)] = 2
         
     if ("MAKE_DEAD" in event_array):
         make = "MAKE_DEAD"
